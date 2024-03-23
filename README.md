@@ -19,3 +19,5 @@ _(https://r4ven.fr/en/blog/next-auth-v4-secret/)_
 _(https://next-auth.js.org/deployment/vercel)_
 
 npx shadcn-ui@latest add dropdown
+
+npx shadcn-ui add input
