@@ -13,3 +13,9 @@ npm install --save-dev @types/ws
 npm update -g prisma
 
 npm install bufferutil utf-8-validate
+
+Next Auth
+_(https://r4ven.fr/en/blog/next-auth-v4-secret/)_
+_(https://next-auth.js.org/deployment/vercel)_
+
+npx shadcn-ui@latest add dropdown
