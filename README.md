@@ -11,3 +11,5 @@ npm install dotenv
 npm install @prisma/adapter-neon @neondatabase/serverless ws
 npm install --save-dev @types/ws
 npm update -g prisma
+
+npm install bufferutil utf-8-validate

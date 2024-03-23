@@ -42,6 +42,7 @@
     "@upstash/redis": "^1.21.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
+    "bufferutil": "^4.0.8",
     "class-variance-authority": "^0.6.0",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
@@ -69,6 +70,7 @@
     "tailwindcss-animate": "^1.0.5",
     "typescript": "5.0.4",
     "uploadthing": "^4.0.0",
+    "utf-8-validate": "^6.0.3",
     "ws": "^8.16.0",
     "zod": "^3.21.4"
   },
