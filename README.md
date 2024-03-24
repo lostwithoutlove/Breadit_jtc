@@ -21,3 +21,15 @@ _(https://next-auth.js.org/deployment/vercel)_
 npx shadcn-ui@latest add dropdown
 
 npx shadcn-ui add input
+
+THUS the Tech Stack is
+
+1. Next.Js Framework
+2. ShadCN for UI
+3. Prisma ORM
+4. PostgreSQL for Database
+5. Supabase as Infrastructure Provoder
+6. Next Auth for Authentication
+7. Axios for API calls
+8. Tanstack Query for State Management
+9. Zod for Validation

@@ -1,13 +1,25 @@
 "use client";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/input";
+import axios, { AxiosError } from "axios";
+
+import { CreateSubredditPayload } from "@/lib/validators/subreddit";
 
 const Page = () => {
   const router = useRouter();
   const [input, setInput] = useState<string>("");
+
+  const { mutate: createCommunity, isLoading } = useMutation({
+    mutationFn: async () => {
+      const payload: CreateSubredditPayload = { name: input };
+      const { data } = await axios.post("/api/subreddit", payload);
+      return data as string;
+    },
+  });
 
   return (
     <div className="container flex items-center h-full max-w-3xl mx-auto">
