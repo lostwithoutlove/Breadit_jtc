@@ -13,6 +13,7 @@ npm install --save-dev @types/ws
 npm update -g prisma
 
 npm install bufferutil utf-8-validate
+npm install @supabase/ssr
 
 Next Auth
 _(https://r4ven.fr/en/blog/next-auth-v4-secret/)_
