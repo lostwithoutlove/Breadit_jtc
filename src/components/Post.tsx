@@ -5,7 +5,7 @@ import { Post, User, Vote } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { FC, useRef } from "react";
-//import EditorOutput from "./EditorOutput";
+import EditorOutput from "./EditorOutput";
 import PostVoteClient from "./post-vote/PostVoteClient";
 
 type PartialVote = Pick<Vote, "type">;
@@ -32,7 +32,7 @@ const Post: FC<PostProps> = ({
   return (
     <div className="rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
-        Post Vote Client
+        {/* Post Vote Client*/}
         <div className="w-0 flex-1">
           <div className="max-h-40 mt-1 text-xs text-gray-500">
             {subredditName ? (
@@ -58,7 +58,11 @@ const Post: FC<PostProps> = ({
             className="relative text-sm max-h-40 w-full overflow-clip"
             ref={pRef}
           >
-            Editor Output
+            <EditorOutput content={post.content} />
+            {pRef.current?.clientHeight === 160 ? (
+              // blur bottom if content is too long
+              <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent"></div>
+            ) : null}
           </div>
         </div>
       </div>
