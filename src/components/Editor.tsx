@@ -111,6 +111,19 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   }, []);
 
   useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        value;
+        toast({
+          title: "Something went wrong.",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       setIsMounted(true);
     }
@@ -133,19 +146,6 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
       };
     }
   }, [isMounted, initializeEditor]);
-
-  useEffect(() => {
-    if (Object.keys(errors).length) {
-      for (const [_key, value] of Object.entries(errors)) {
-        value;
-        toast({
-          title: "Something went wrong line 142 Editor.tsx.",
-          description: (value as { message: string }).message,
-          variant: "destructive",
-        });
-      }
-    }
-  }, [errors]);
 
   async function onSubmit(data: FormData) {
     const blocks = await ref.current?.save();
@@ -178,6 +178,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
               // @ts-ignore
               _titleRef.current = e;
             }}
+            {...rest}
             placeholder="Title"
             className="w-full resize-none appearance-none overflow-hidden bg-transparent text-3xl font-bold focus:outline-none"
           />
