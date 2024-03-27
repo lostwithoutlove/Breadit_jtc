@@ -9,12 +9,18 @@ import EditorJS from "@editorjs/editorjs";
 import axios from "axios";
 import { uploadFiles } from "@/lib/uploadthing";
 import { usePathname, useRouter } from "next/navigation";
+import { error } from "console";
+import { toast } from "@/hooks/use-toast";
 
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+
+type FormData = z.infer<typeof PostValidator>;
 interface EditorProps {
   subredditId: string;
 }
 
-const Editor: FC<EditorProps> = () => {
+const Editor: FC<EditorProps> = ({ subredditId }) => {
   const {
     register,
     handleSubmit,
@@ -93,14 +99,77 @@ const Editor: FC<EditorProps> = () => {
 
     if (isMounted) {
       init();
-      return () => {};
+      return () => {
+        ref.current?.destroy();
+        ref.current = undefined;
+      };
     }
   }, [isMounted, initializeEditor]);
+
+  const { mutate: createPost } = useMutation({
+    mutationFn: async ({
+      title,
+      content,
+      subredditId,
+    }: PostCreationRequest) => {
+      const payload: PostCreationRequest = { title, content, subredditId };
+      const { data } = await axios.post("/api/subreddit/post/create", payload);
+      return data;
+    },
+    onError: () => {
+      return toast({
+        title: "Something went wrong.",
+        description: "Your post was not published. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      const newPathname = pathname.split("/").slice(0, -1).join("/");
+      router.push(newPathname);
+      router.refresh();
+      return toast({
+        description: "Your post has been published.",
+      });
+    },
+  });
+
+  async function onSubmit(data: FormData) {
+    const blocks = await ref.current?.save();
+
+    const payload: PostCreationRequest = {
+      title: data.title,
+      content: blocks,
+      subredditId,
+    };
+    createPost(payload);
+  }
+
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        value;
+        toast({
+          title: "Something went wrong line 152 Editor.tsx.",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
+
+  if (!isMounted) {
+    return null;
+  }
+
   const { ref: titleRef, ...rest } = register("title");
 
   return (
     <div className="w-full p-4 bg-zinc-50 rounded-lg border-zinc-200">
-      <form id="subreddit-post-form" className="w-fit" onSubmit={() => {}}>
+      <form
+        id="subreddit-post-form"
+        className="w-fit"
+        onSubmit={handleSubmit((e) => {})}
+      >
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
             ref={(e) => {
