@@ -27,7 +27,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     formState: { errors },
   } = useForm<PostCreationRequest>({
     resolver: zodResolver(PostValidator),
-    defaultValues: { title: "", content: null },
+    defaultValues: { subredditId, title: "", content: null },
   });
 
   const ref = useRef<EditorJS>();
@@ -36,11 +36,32 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMounted(true);
-    }
-  }, []);
+  const { mutate: createPost } = useMutation({
+    mutationFn: async ({
+      title,
+      content,
+      subredditId,
+    }: PostCreationRequest) => {
+      const payload: PostCreationRequest = { title, content, subredditId };
+      const { data } = await axios.post("/api/subreddit/post/create", payload);
+      return data;
+    },
+    onError: () => {
+      return toast({
+        title: "Something went wrong.",
+        description: "Your post was not published. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      const newPathname = pathname.split("/").slice(0, -1).join("/");
+      router.push(newPathname);
+      router.refresh();
+      return toast({
+        description: "Your post has been published.",
+      });
+    },
+  });
 
   const initializeEditor = useCallback(async () => {
     const EditorJS = (await import("@editorjs/editorjs")).default;
@@ -90,11 +111,18 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   }, []);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMounted(true);
+    }
+  }, []);
+
+  useEffect(() => {
     const init = async () => {
       await initializeEditor();
+
       setTimeout(() => {
-        //set focus to title
-      });
+        _titleRef?.current?.focus();
+      }, 0);
     };
 
     if (isMounted) {
@@ -106,32 +134,18 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     }
   }, [isMounted, initializeEditor]);
 
-  const { mutate: createPost } = useMutation({
-    mutationFn: async ({
-      title,
-      content,
-      subredditId,
-    }: PostCreationRequest) => {
-      const payload: PostCreationRequest = { title, content, subredditId };
-      const { data } = await axios.post("/api/subreddit/post/create", payload);
-      return data;
-    },
-    onError: () => {
-      return toast({
-        title: "Something went wrong.",
-        description: "Your post was not published. Please try again.",
-        variant: "destructive",
-      });
-    },
-    onSuccess: () => {
-      const newPathname = pathname.split("/").slice(0, -1).join("/");
-      router.push(newPathname);
-      router.refresh();
-      return toast({
-        description: "Your post has been published.",
-      });
-    },
-  });
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        value;
+        toast({
+          title: "Something went wrong line 142 Editor.tsx.",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
 
   async function onSubmit(data: FormData) {
     const blocks = await ref.current?.save();
@@ -144,19 +158,6 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     createPost(payload);
   }
 
-  useEffect(() => {
-    if (Object.keys(errors).length) {
-      for (const [_key, value] of Object.entries(errors)) {
-        value;
-        toast({
-          title: "Something went wrong line 152 Editor.tsx.",
-          description: (value as { message: string }).message,
-          variant: "destructive",
-        });
-      }
-    }
-  }, [errors]);
-
   if (!isMounted) {
     return null;
   }
@@ -168,7 +169,7 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
       <form
         id="subreddit-post-form"
         className="w-fit"
-        onSubmit={handleSubmit((e) => {})}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
@@ -181,6 +182,13 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
             className="w-full resize-none appearance-none overflow-hidden bg-transparent text-3xl font-bold focus:outline-none"
           />
           <div id="editor" className="min-h-[500px]" />
+          <p className="text-sm text-gray-500">
+            Use{" "}
+            <kbd className="rounded-md border bg-muted px-1 text-xs uppercase">
+              Tab
+            </kbd>{" "}
+            to open the command menu.
+          </p>
         </div>
       </form>
     </div>
