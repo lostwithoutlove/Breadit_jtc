@@ -1,8 +1,11 @@
 import { Home as HomeIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/Button";
+import { getAuthSession } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getAuthSession();
+
   return (
     <>
       <h1 className="font-bold text-3xl md:text-4xl">Your feed</h1>

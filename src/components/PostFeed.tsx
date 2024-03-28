@@ -1,8 +1,9 @@
 "use client";
+
+import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { FC, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { ExtendedPost } from "@/types/db";
-import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { useIntersection } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,15 +22,18 @@ const PostFeed: FC<PostFeedProps> = async ({ initialPosts, subredditName }) => {
     threshold: 1,
   });
   const { data: session } = useSession();
+
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["infinite-query"],
     async ({ pageParam = 1 }) => {
       const query =
         `/api/posts?limit=${INFINITE_SCROLL_PAGINATION_RESULTS}&page=${pageParam}` +
         (!!subredditName ? `&subredditName=$(subredditName)` : "");
+
       const { data } = await axios.get(query);
       return data as ExtendedPost[];
     },
+
     {
       getNextPageParam: (_, pages) => {
         return pages.length + 1;
@@ -54,10 +58,13 @@ const PostFeed: FC<PostFeedProps> = async ({ initialPosts, subredditName }) => {
           if (vote.type === "DOWN") return acc - 1;
           return acc;
         }, 0);
+
         const currentVote = post.votes.find(
           (vote) => vote.userId === session?.user.id
         );
+
         if (index === posts.length - 1) {
+          // Add a ref to the last post in the list
           return (
             <li key={post.id} ref={ref}>
               <Post
@@ -82,6 +89,11 @@ const PostFeed: FC<PostFeedProps> = async ({ initialPosts, subredditName }) => {
           );
         }
       })}
+      {isFetchingNextPage && (
+        <li className="flex justify-center">
+          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+        </li>
+      )}
     </ul>
   );
 };
