@@ -23,7 +23,7 @@ interface PostProps {
 
 const Post: FC<PostProps> = ({
   post,
-  votesAmt: _votesAmt,
+  votesAmt,
   currentVote: _currentVote,
   subredditName,
   commentAmt,
@@ -33,6 +33,11 @@ const Post: FC<PostProps> = ({
     <div className="rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
         {/* Post Vote Client*/}
+        <PostVoteClient
+          postId={post.id}
+          initialVotesAmt={votesAmt}
+          initialVote={_currentVote?.type}
+        />
         <div className="w-0 flex-1">
           <div className="max-h-40 mt-1 text-xs text-gray-500">
             {subredditName ? (

@@ -82,8 +82,6 @@ const PostFeed: FC<PostFeedProps> = async ({ initialPosts, subredditName }) => {
           );
         }
       })}
-
-      <p>Postfeed</p>
     </ul>
   );
 };
